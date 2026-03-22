@@ -30,7 +30,7 @@
 
                 <div id="upload-preview-wrap" style="display:none; flex-direction:column; align-items:center; gap:0.75rem; padding: 20px;">
                     <img id="upload-preview-img" src="" alt="preview"
-                         style="max-height:180px; max-width:100%; border-radius:12px; object-fit:cover; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
+                        style="max-height:180px; max-width:100%; border-radius:12px; object-fit:cover; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
                     <span id="upload-preview-name" style="font-size:0.85rem; color:#555;"></span>
                     <span style="display:flex; align-items:center; gap:0.4rem; color:#22c55e; font-weight:700; font-size:1rem;">
                         <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +71,7 @@
 
 {% block scripts %}
 <script>
-  (function () {
+(function () {
     var form = document.getElementById('upload-form');
     var btn = document.getElementById('upload-btn');
     var input = document.getElementById('pdf-upload');
@@ -81,26 +81,26 @@
     var boxContentWrapper = document.getElementById('upload-box-content-wrapper');
 
     if (input) {
-      input.addEventListener('change', function () {
+    input.addEventListener('change', function () {
         var file = input.files[0];
         if (!file) return;
         var reader = new FileReader();
         reader.onload = function (e) {
-          previewImg.src = e.target.result;
-          previewName.textContent = file.name;
-          boxContentWrapper.style.display = 'none';
-          previewWrap.style.display = 'flex';
+        previewImg.src = e.target.result;
+        previewName.textContent = file.name;
+        boxContentWrapper.style.display = 'none';
+        previewWrap.style.display = 'flex';
         };
         reader.readAsDataURL(file);
-      });
+    });
     }
 
     if (form && btn) {
-      form.addEventListener('submit', function () {
+    form.addEventListener('submit', function () {
         btn.disabled = true;
         btn.textContent = 'Analyzing Ingredients...';
-      });
+    });
     }
-  })();
+})();
 </script>
 {% endblock %}
