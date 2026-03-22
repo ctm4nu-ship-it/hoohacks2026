@@ -23,42 +23,75 @@
                 </p>
             </div>
 
+            <h3 class="listed-ingredients-heading">Listed ingredients:</h3>
+            {% if fridge_ingredients %}
+                <ul class="listed-ingredients-list">
+                    {% for ing in fridge_ingredients %}
+                        <li>{{ ing }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No ingredients listed.</p>
+            {% endif %}
+            </div>
+
             <h2 class="results-fridge-heading">Top {{ top_fridge_count }} recipes for your fridge &amp; filters</h2>
             <p class="results-fridge-sub">Ranked by overlap between these ingredients and each recipe’s ingredient list (within your dietary choices).</p>
 
             {% if top_fridge_recipes %}
-                <div class="results-table-wrap results-table-wrap--featured">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Title</th>
-                                <th scope="col">Match</th>
-                                <th scope="col">Category</th>
-                                <th scope="col">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for r in top_fridge_recipes %}
-                            <tr>
-                                <td class="results-table__title">{{ r.recipe_title }}</td>
-                                <td class="results-table__match">
-                                    <span class="match-score">Score {{ r.match_score }}</span>
-                                    {% if r.matched_ingredients %}
-                                        <span class="match-ings">{{ r.matched_ingredients | join(', ') }}</span>
-                                    {% else %}
-                                        <span class="match-ings match-ings--weak">No direct text overlap — best available fit</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ r.category }}{% if r.subcategory and r.subcategory != r.category %} — {{ r.subcategory }}{% endif %}</td>
-                                <td class="results-table__desc">{{ r.description }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="cards-grid">
+                    {% for r in top_fridge_recipes %}
+                        <div class="recipe-card">
+                            <div class="match-badge">{{ r.match_score }}% Match</div>
+                            <div class="recipe-card__image">
+                                {% if r.image_url %}
+                                    <img src="{{ r.image_url }}" alt="{{ r.recipe_title }}">
+                                {% elif r.matched_ingredients and r.matched_ingredients|length > 0 %}
+                                    <img src="/img/generated/{{ r.matched_ingredients[0]|slugify }}.svg" alt="{{ r.matched_ingredients[0] }}">
+                                {% endif %}
+                            </div>
+                            <h3 class="recipe-card__title">{{ r.recipe_title }}</h3>
+                            <div class="recipe-card__meta">{{ r.category }}{% if r.subcategory and r.subcategory != r.category %} — {{ r.subcategory }}{% endif %}</div>
+                            <div class="recipe-tags">
+                                        {% for m in r.matched_ingredients %}
+                                            <span class="recipe-tag">
+                                                <img class="ing-thumb" src="/img/generated/{{ m|slugify }}.svg" alt="{{ m }}">{{ m }}
+                                            </span>
+                                        {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             {% else %}
                 <p class="results-empty">No recipes to rank (try relaxing dietary filters).</p>
             {% endif %}
+            {% endif %}
+
+            <h2 class="results-more-heading">Potential recipes</h2>
+            {% if potential_recipes %}
+                <div class="cards-grid">
+                    {% for p in potential_recipes %}
+                        <div class="recipe-card">
+                            <div class="recipe-card__image">
+                                {% if p.image_url %}
+                                    <img src="{{ p.image_url }}" alt="{{ p.recipe_title }}">
+                                {% elif p.matched_ingredients and p.matched_ingredients|length > 0 %}
+                                    <img src="/img/generated/{{ p.matched_ingredients[0]|slugify }}.svg" alt="{{ p.matched_ingredients[0] }}">
+                                {% elif fridge_ingredients and fridge_ingredients|length > 0 %}
+                                    <img src="/img/generated/{{ fridge_ingredients[0]|slugify }}.svg" alt="{{ fridge_ingredients[0] }}">
+                                {% endif %}
+                            </div>
+                            <h3 class="recipe-card__title">{{ p.recipe_title }}</h3>
+                            <div class="recipe-card__meta">{{ p.category }}</div>
+                            <div class="recipe-tags">
+                                {% if p.description %}<span class="recipe-tag">{{ p.description[:40] }}</span>{% endif %}
+                                {% if p.difficulty %}<span class="recipe-tag">{{ p.difficulty }}</span>{% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="results-empty">No potential recipes match those filters.</p>
             {% endif %}
 
             <h2 class="results-more-heading">All recipes matching your filters</h2>

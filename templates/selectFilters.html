@@ -3,56 +3,76 @@
 {% block header_title %}Dietary filters{% endblock %}
 {% block content %}
         <section class="filters-section">
-            <p class="filters-intro">Your fridge photo is uploaded — this is the next step. Choose dietary restrictions below. Use <strong>Start over</strong> anytime to return home and clear your session (including filters).</p>
+            <p class="filters-intro">Your fridge photo is uploaded — we found these ingredients:</p>
+
+            {% if fridge_ingredients %}
+                <div class="fridge-ai-box">
+                    <div class="fridge-ai-box__tags">
+                        {% for ing in fridge_ingredients %}
+                            <span class="ing-tag">
+                                <img class="ing-thumb" src="/img/generated/{{ ing|slugify }}.svg" alt="{{ ing }}">{{ ing }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
             <form method="post" action="{{ url_for('results') }}" class="filters-form">
-            <div class="filter-grid">
-                <label class="filter-field">Vegan
-                    <select name="vegan" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Vegetarian
-                    <select name="vegetarian" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Gluten-free
-                    <select name="gluten_free" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Dairy-free
-                    <select name="dairy_free" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Nut-free
-                    <select name="nut_free" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Halal
-                    <select name="halal" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-                <label class="filter-field">Kosher
-                    <select name="kosher" class="filter-select">
-                        <option value="No">no</option>
-                        <option value="Yes">yes</option>
-                    </select>
-                </label>
-            </div>
-            <h2 class="filters-submit-heading">Enter selections</h2>
-            <p class="filters-submit-wrap">
-                <button type="submit" class="filters-submit-btn">Enter selections</button>
-            </p>
+                <div class="filter-cards">
+                    <label class="filter-card">
+                        <span class="label">Vegetarian</span>
+                        <select name="vegetarian" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Vegan</span>
+                        <select name="vegan" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Gluten-Free</span>
+                        <select name="gluten_free" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Dairy-Free</span>
+                        <select name="dairy_free" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Nut-Free</span>
+                        <select name="nut_free" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Halal</span>
+                        <select name="halal" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                    <label class="filter-card">
+                        <span class="label">Kosher</span>
+                        <select name="kosher" class="filter-select">
+                            <option value="No">no</option>
+                            <option value="Yes">yes</option>
+                        </select>
+                    </label>
+                </div>
+
+                <p class="filters-submit-wrap">
+                    <button type="submit" class="filters-submit-btn">Find My Recipes →</button>
+                </p>
             </form>
         </section>
 {% endblock %}

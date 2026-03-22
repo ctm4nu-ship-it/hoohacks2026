@@ -2,15 +2,27 @@
 {% block title %}Fridge Chef — Find a recipe{% endblock %}
 {% block header_title %}Find a recipe{% endblock %}
 {% block content %}
-        <section>
-            <h2>Fridge recipe generator</h2>
-            <p>Upload a clear photo of the <strong>inside of your fridge</strong> (JPG or PNG). We use AI to confirm it’s a fridge and to read visible ingredients, then you’ll pick dietary filters. Without <code>OPENAI_API_KEY</code>, demo ingredients are used. Use <strong>Start over</strong> to return home.</p>
-            <form id="upload-form" method="POST" action="{{ url_for('upload_image') }}" enctype="multipart/form-data">
-                <label for="pdf-upload">Select a picture of your fridge (JPG or PNG):</label>
-                <input type="file" id="pdf-upload" name="pdfFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
-                <button type="submit" id="upload-btn">Upload photo</button>
-            </form>
-        </section>
+    <section class="hero">
+      <h1>Upload Your Fridge Photo</h1>
+      <p class="lead">Our AI will analyze your ingredients and find perfect recipes. Upload a clear photo of the inside of your fridge (JPG or PNG).</p>
+
+      <form id="upload-form" method="POST" action="{{ url_for('upload_image') }}" enctype="multipart/form-data">
+        <div class="upload-box">
+          <div class="upload-inner">
+            <div class="upload-icon">⇪</div>
+            <div class="upload-hint">Drop your fridge photo here or click to browse from your device</div>
+
+            <div class="custom-file">
+              <label class="file-btn" for="pdf-upload-input">Choose photo</label>
+              <input type="file" id="pdf-upload-input" name="pdfFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
+              <span id="selected-filename" class="file-name">No file chosen</span>
+            </div>
+
+            <button type="submit" id="upload-btn" class="cta-button continue-btn">Continue to Filters →</button>
+          </div>
+        </div>
+      </form>
+    </section>
 {% endblock %}
 {% block scripts %}
     <script>
@@ -21,6 +33,23 @@
         form.addEventListener('submit', function () {
           btn.disabled = true;
           btn.textContent = 'Uploading…';
+        });
+      })();
+    </script>
+    <script>
+      // wire custom file control
+      (function () {
+        var fileInput = document.getElementById('pdf-upload-input');
+        var fileName = document.getElementById('selected-filename');
+        var fileBtn = document.querySelector('.file-btn');
+        if (!fileInput || !fileName || !fileBtn) return;
+        fileBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          fileInput.click();
+        });
+        fileInput.addEventListener('change', function () {
+          var f = fileInput.files && fileInput.files[0];
+          fileName.textContent = f ? f.name : 'No file chosen';
         });
       })();
     </script>

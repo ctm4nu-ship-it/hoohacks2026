@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.utils import secure_filename
 import os
 import re
@@ -9,6 +9,132 @@ import re
 import pandas as pd
 
 from fridge_ai import analyze_fridge_image
+import hashlib
+
+
+def _slugify(text: str) -> str:
+    text = str(text or '')
+    text = re.sub(r"[^a-z0-9]+", '-', text.lower())
+    text = re.sub(r'-+', '-', text).strip('-')
+    if not text:
+        text = hashlib.sha1(str(text).encode('utf-8')).hexdigest()[:8]
+    return text
+
+
+def _ensure_generated_dir():
+    gen_dir = os.path.join(os.path.dirname(__file__), 'src', 'img', 'generated')
+    os.makedirs(gen_dir, exist_ok=True)
+    return gen_dir
+
+
+def _color_for(text: str) -> str:
+    h = hashlib.sha1(text.encode('utf-8')).hexdigest()
+    # take first 6 hex for color, but keep it soft
+    r = int(h[0:2], 16)
+    g = int(h[2:4], 16)
+    b = int(h[4:6], 16)
+    # lighten
+    r = 180 + (r // 4)
+    g = 160 + (g // 6)
+    b = 160 + (b // 6)
+    return f'rgb({r},{g},{b})'
+
+
+def _text_color_for_bg(rgb: str) -> str:
+    # rgb(r,g,b)
+    nums = [int(x) for x in re.findall(r'\d+', rgb)]
+    luminance = (0.299 * nums[0] + 0.587 * nums[1] + 0.114 * nums[2]) / 255
+    return '#111' if luminance > 0.6 else '#fff'
+
+
+def generate_ingredient_svg(name: str):
+    """Create a simple SVG thumbnail for an ingredient and save to src/img/generated/<slug>.svg"""
+    if not name:
+        return None
+    slug = _slugify(name)
+    gen_dir = _ensure_generated_dir()
+    path = os.path.join(gen_dir, f"{slug}.svg")
+    if os.path.exists(path):
+        return f"/img/generated/{slug}.svg"
+
+        bg = _color_for(name)
+        fg = _text_color_for_bg(bg)
+        label = name.title()
+        # Small emoji map for common ingredients
+        emoji_map = {
+            'milk': '🥛', 'eggs': '🥚', 'cheese': '🧀', 'tomatoes': '🍅', 'lettuce': '🥬',
+            'chicken': '🍗', 'beef': '🥩', 'onion': '🧅', 'pepper': '🌶️', 'avocado': '🥑',
+            'carrot': '🥕', 'banana': '🍌', 'apple': '🍎', 'potato': '🥔', 'bread': '🍞'
+        }
+        key = name.strip().lower().split()[0]
+        emoji = emoji_map.get(key, '')
+
+        if emoji:
+            # big emoji only (no large label) for clearer thumbnails
+            svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1">
+          <stop offset="0%" stop-color="{bg}" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" rx="18" ry="18" fill="url(#g)" />
+      <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-family="Segoe UI Emoji, Noto Color Emoji, Arial" font-size="84">{emoji}</text>
+    </svg>'''
+        else:
+            svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260">
+      <rect width="100%" height="100%" rx="18" ry="18" fill="{bg}" />
+      <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="30" fill="{fg}">{label}</text>
+    </svg>'''
+
+        try:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(svg)
+            return f"/img/generated/{slug}.svg"
+        except Exception:
+            return None
+
+
+def _ensure_recipe_generated_dir():
+    gen_dir = os.path.join(os.path.dirname(__file__), 'src', 'img', 'generated', 'recipes')
+    os.makedirs(gen_dir, exist_ok=True)
+    return gen_dir
+
+
+def generate_recipe_svg(title: str, subtitle: str = ''):
+    """Generate a simple SVG for a recipe title and return the web path."""
+    if not title:
+        return None
+    slug = _slugify(title)
+    gen_dir = _ensure_recipe_generated_dir()
+    path = os.path.join(gen_dir, f"{slug}.svg")
+    if os.path.exists(path):
+        return f"/img/generated/recipes/{slug}.svg"
+
+    bg = _color_for(title)
+    fg = _text_color_for_bg(bg)
+    title_text = title.title()
+    subtitle_text = (subtitle or '').strip()
+
+    # compose SVG with headline and optional subline
+    if subtitle_text:
+        svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+  <rect width="100%" height="100%" rx="18" ry="18" fill="{bg}" />
+  <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="28" fill="{fg}" font-weight="700">{title_text}</text>
+  <text x="50%" y="63%" dominant-baseline="middle" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="{fg}">{subtitle_text}</text>
+</svg>'''
+    else:
+        svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340">
+  <rect width="100%" height="100%" rx="18" ry="18" fill="{bg}" />
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="32" fill="{fg}" font-weight="700">{title_text}</text>
+</svg>'''
+
+    try:
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(svg)
+        return f"/img/generated/recipes/{slug}.svg"
+    except Exception:
+        return None
 
 ALLOWED_IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png'}
 
@@ -47,6 +173,13 @@ def get_recipes():
     if _recipes_df is None:
         _recipes_df = pd.read_csv(RECIPES_CSV)
     return _recipes_df
+
+
+# register slugify for templates
+def _jinja_slugify(s):
+    return _slugify(s)
+
+app.jinja_env.filters['slugify'] = _jinja_slugify
 
 
 def parse_dietary_form():
@@ -189,11 +322,23 @@ def results():
     limited = filtered.head(RESULTS_DISPLAY_LIMIT)
     recipes = recipes_for_template(limited)
 
+    # full potential recipes list
+    potential_recipes = recipes_for_template(filtered)
+
     fridge_items = session.get(SESSION_FRIDGE_INGREDIENTS) or []
     fridge_note = session.get(SESSION_FRIDGE_NOTE, '')
     fridge_demo = session.get(SESSION_FRIDGE_DEMO, False)
     show_fridge_panel = SESSION_FRIDGE_INGREDIENTS in session
     top_fridge = top_fridge_recipes(filtered, fridge_items, n=TOP_FRIDGE_MATCHES)
+
+    # generate recipe images (title-based) and attach `image_url` for template use
+    try:
+        for r in top_fridge:
+            r['image_url'] = generate_recipe_svg(r.get('recipe_title') or '', r.get('category') or '')
+        for p in potential_recipes:
+            p['image_url'] = generate_recipe_svg(p.get('recipe_title') or '', p.get('category') or '')
+    except Exception:
+        pass
 
     labels = {
         'vegan': 'Vegan',
@@ -205,10 +350,10 @@ def results():
         'kosher': 'Kosher',
     }
     active_filters = [labels[k] for k, v in selections.items() if v == 'Yes']
-
     return render_template(
         'results.html',
         recipes=recipes,
+        potential_recipes=potential_recipes,
         total_count=total,
         shown_count=min(total, RESULTS_DISPLAY_LIMIT),
         display_limit=RESULTS_DISPLAY_LIMIT,
@@ -221,6 +366,34 @@ def results():
         top_fridge_recipes=top_fridge,
         top_fridge_count=TOP_FRIDGE_MATCHES,
     )
+
+
+@app.route('/result', methods=['GET'])
+def result_json():
+    """Return JSON with listed ingredients and potential recipes matching dietary filters.
+
+    Reads the upload/check state and dietary selections from session and returns:
+      {"listed_ingredients": [...], "potential_recipes": [...]} or an error.
+    """
+    if not session.get(SESSION_UPLOAD_OK):
+        return jsonify({"error": "Upload a fridge photo first."}), 400
+
+    selections = session.get(SESSION_DIETARY_FILTERS)
+    if not selections:
+        return jsonify({"error": "No dietary filters selected."}), 400
+
+    df = get_recipes()
+    filtered = apply_dietary_filters(df, selections)
+
+    # Return the full set of filtered recipes (not just the displayed slice).
+    potential = recipes_for_template(filtered)
+
+    fridge_items = session.get(SESSION_FRIDGE_INGREDIENTS) or []
+
+    return jsonify({
+        "listed_ingredients": fridge_items,
+        "potential_recipes": potential,
+    })
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
@@ -270,6 +443,17 @@ def upload_image():
         session[SESSION_FRIDGE_INGREDIENTS] = analysis.get('ingredients') or []
         session[SESSION_FRIDGE_NOTE] = analysis.get('short_notes', '')
         session[SESSION_FRIDGE_DEMO] = bool(analysis.get('demo'))
+
+        # Generate small SVG thumbnails for detected ingredients so templates can show images.
+        try:
+            ings = session.get(SESSION_FRIDGE_INGREDIENTS) or []
+            for ing in ings:
+                try:
+                    generate_ingredient_svg(ing)
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
         session[SESSION_UPLOAD_OK] = True
         return redirect(url_for('select_filters'))
