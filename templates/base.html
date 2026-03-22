@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Fridge Chef{% endblock %}</title>
+    <title>{% block title %}SnapshotChef{% endblock %}</title>
     <link rel="preload" href="{{ url_for('static', filename='css/styles.css') }}" as="style">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     {% block extra_head %}{% endblock %}
@@ -11,7 +11,7 @@
 <body>
     <div class="app-shell">
         <header class="site-header">
-            <h1>{% block header_title %}Fridge Chef{% endblock %}</h1>
+            <h1>{% block header_title %}SnapshotChef{% endblock %}</h1>
         </header>
         <nav class="site-nav" aria-label="Main">
             {% if request.endpoint == 'home' %}
