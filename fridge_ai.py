@@ -21,6 +21,10 @@ def _parse_json_response(text: str) -> dict:
 
 
 def analyze_fridge_image(image_path: str) -> dict:
+    """
+    Returns dict with keys:
+      is_fridge (bool), ingredients (list[str]), short_notes (str), demo (bool optional)
+    """
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         return {
@@ -77,3 +81,15 @@ Respond with ONLY valid JSON in this exact shape (no markdown):
         "short_notes": notes,
         "demo": False,
     }
+
+def generate_ai_recipes(ingredients):
+    from openai import OpenAI
+    client = OpenAI() # It will automatically look for the env var
+    
+    prompt = f"I have {', '.join(ingredients)}. Suggest 3 creative recipes."
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.choices[0].message.content

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Fridge Chef{% endblock %}</title>
+    <link rel="preload" href="{{ url_for('static', filename='css/styles.css') }}" as="style">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="app-shell">
+        <header class="site-header">
+            <h1>{% block header_title %}Fridge Chef{% endblock %}</h1>
+        </header>
+        <nav class="site-nav" aria-label="Main">
+            {% if request.endpoint == 'home' %}
+                <span class="nav-link is-active" aria-current="page">Home</span>
+            {% else %}
+                <a href="{{ url_for('home') }}" class="nav-link">Start over</a>
+            {% endif %}
+        </nav>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages" role="status">
+                    {% for message in messages %}
+                        <p class="flash-messages__text">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <main id="main-content" class="main-content" tabindex="-1">
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="site-footer">
+            <p>
+                Contact us at:
+                <a href="mailto:eaz9pn@virginia.edu">eaz9pn@virginia.edu</a>,
+                <a href="mailto:ctm4nu@virginia.edu">ctm4nu@virginia.edu</a>, or
+                <a href="mailto:vnm3nw@virginia.edu">vnm3nw@virginia.edu</a>
+                <br>
+                &copy; 2026 PDF Chef
+            </p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='js/nav.js') }}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

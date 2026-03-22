@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Fridge Chef{% endblock %}
+{% block header_title %}Welcome to Fridge Chef{% endblock %}
+{% block content %}
+        <section>
+            <h2>Start here</h2>
+            <p class="lead">Upload a fridge photo next. After it uploads successfully, you’ll move on to dietary filters. Use <strong>Start over</strong> anytime to return to this screen.</p>
+            <a class="cta-button" href="{{ url_for('find_recipe') }}">Continue to upload</a>
+        </section>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Fridge Chef — Results{% endblock %}
+{% block header_title %}Recipe results{% endblock %}
+{% block content %}
+        <section class="results-section">
+            {% if show_fridge_panel %}
+            <div class="fridge-ai-box">
+                <h2 class="fridge-ai-box__title">What we saw in your fridge</h2>
+                {% if fridge_demo %}
+                    <p class="fridge-ai-box__demo"><strong>Demo mode:</strong> set the <code>OPENAI_API_KEY</code> environment variable for real vision analysis.</p>
+                {% endif %}
+                {% if fridge_note %}
+                    <p class="fridge-ai-box__note">{{ fridge_note }}</p>
+                {% endif %}
+                <p class="fridge-ai-box__tags">
+                    {% if fridge_ingredients %}
+                        {% for ing in fridge_ingredients %}
+                            <span class="ing-tag">{{ ing }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="fridge-ai-box__empty">No specific ingredients were identified — matches below use best-effort ranking.</span>
+                    {% endif %}
+                </p>
+            </div>
+
+            <h2 class="results-fridge-heading">Top {{ top_fridge_count }} recipes for your fridge &amp; filters</h2>
+            <p class="results-fridge-sub">Ranked by overlap between these ingredients and each recipe’s ingredient list (within your dietary choices).</p>
+
+            {% if top_fridge_recipes %}
+                <div class="results-table-wrap results-table-wrap--featured">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Match</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in top_fridge_recipes %}
+                            <tr>
+                                <td class="results-table__title">{{ r.recipe_title }}</td>
+                                <td class="results-table__match">
+                                    <span class="match-score">Score {{ r.match_score }}</span>
+                                    {% if r.matched_ingredients %}
+                                        <span class="match-ings">{{ r.matched_ingredients | join(', ') }}</span>
+                                    {% else %}
+                                        <span class="match-ings match-ings--weak">No direct text overlap — best available fit</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ r.category }}{% if r.subcategory and r.subcategory != r.category %} — {{ r.subcategory }}{% endif %}</td>
+                                <td class="results-table__desc">{{ r.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="results-empty">No recipes to rank (try relaxing dietary filters).</p>
+            {% endif %}
+            {% endif %}
+
+            <h2 class="results-more-heading">All recipes matching your filters</h2>
+            <p class="results-summary">
+                {% if active_filters %}
+                    Recipes that match:
+                    <strong>{{ active_filters | join(', ') }}</strong>.
+                {% else %}
+                    No dietary restrictions selected — full filtered dataset.
+                {% endif %}
+            </p>
+            <p class="results-count">
+                <strong>{{ total_count }}</strong> recipe{{ 's' if total_count != 1 else '' }} match{{ '' if total_count == 1 else 'es' }} your filters.
+                {% if total_count > display_limit %}
+                    Showing the first <strong>{{ shown_count }}</strong> in the table below.
+                {% endif %}
+            </p>
+
+            {% if total_count == 0 %}
+                <p class="results-empty">No recipes in the dataset match those choices. Use <strong>Start over</strong> to reset and try different filters.</p>
+            {% else %}
+                <div class="results-table-wrap">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Difficulty</th>
+                                <th scope="col">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recipes %}
+                            <tr>
+                                <td class="results-table__title">{{ r.recipe_title }}</td>
+                                <td>{{ r.category }}{% if r.subcategory and r.subcategory != r.category %} — {{ r.subcategory }}{% endif %}</td>
+                                <td>{{ r.difficulty }}</td>
+                                <td class="results-table__desc">{{ r.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        </section>
+{% endblock %}

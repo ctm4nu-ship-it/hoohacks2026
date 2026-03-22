@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Fridge Chef — Dietary filters{% endblock %}
+{% block header_title %}Dietary filters{% endblock %}
+{% block content %}
+        <section class="filters-section">
+            <p class="filters-intro">Your fridge photo is uploaded — this is the next step. Choose dietary restrictions below. Use <strong>Start over</strong> anytime to return home and clear your session (including filters).</p>
+            <form method="post" action="{{ url_for('results') }}" class="filters-form">
+            <div class="filter-grid">
+                <label class="filter-field">Vegan
+                    <select name="vegan" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Vegetarian
+                    <select name="vegetarian" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Gluten-free
+                    <select name="gluten_free" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Dairy-free
+                    <select name="dairy_free" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Nut-free
+                    <select name="nut_free" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Halal
+                    <select name="halal" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+                <label class="filter-field">Kosher
+                    <select name="kosher" class="filter-select">
+                        <option value="No">no</option>
+                        <option value="Yes">yes</option>
+                    </select>
+                </label>
+            </div>
+            <h2 class="filters-submit-heading">Enter selections</h2>
+            <p class="filters-submit-wrap">
+                <button type="submit" class="filters-submit-btn">Enter selections</button>
+            </p>
+            </form>
+        </section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Fridge Chef — Find a recipe{% endblock %}
+{% block header_title %}Find a recipe{% endblock %}
+{% block content %}
+        <section>
+            <h2>Fridge recipe generator</h2>
+            <p>Upload a clear photo of the <strong>inside of your fridge</strong> (JPG or PNG). We use AI to confirm it’s a fridge and to read visible ingredients, then you’ll pick dietary filters. Without <code>OPENAI_API_KEY</code>, demo ingredients are used. Use <strong>Start over</strong> to return home.</p>
+            <form id="upload-form" method="POST" action="{{ url_for('upload_image') }}" enctype="multipart/form-data">
+                <label for="pdf-upload">Select a picture of your fridge (JPG or PNG):</label>
+                <input type="file" id="pdf-upload" name="pdfFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required>
+                <button type="submit" id="upload-btn">Upload photo</button>
+            </form>
+        </section>
+{% endblock %}
+{% block scripts %}
+    <script>
+      (function () {
+        var form = document.getElementById('upload-form');
+        var btn = document.getElementById('upload-btn');
+        if (!form || !btn) return;
+        form.addEventListener('submit', function () {
+          btn.disabled = true;
+          btn.textContent = 'Uploading…';
+        });
+      })();
+    </script>
+{% endblock %}
