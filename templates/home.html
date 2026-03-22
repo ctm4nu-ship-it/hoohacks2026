@@ -15,7 +15,7 @@
                 <div id="upload-box-content-wrapper">
                     <div class="upload-icon-circle" id="upload-icon">
                         <div class="upload-icon">
-                            <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
+                            <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <circle cx="28" cy="28" r="28" fill="#fff6f4"/>
                                 <path d="M28 38V18M28 18l-7 7M28 18l7 7" stroke="#e8445a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
@@ -45,7 +45,7 @@
             </label>
             
             <div style="height:18px"></div>
-            <button type="submit" id="upload-btn" class="cta-button" style="border: none; width: 100%; cursor: pointer;">Analyze Photo & Continue</button>
+            <button type="submit" id="upload-btn" class="cta-button" style="border: none; width: 100%; cursor: pointer;" onclick="return validateUpload();">Analyze Photo</button>
         </form>
 
         <div class="features-grid">
@@ -96,7 +96,42 @@
     }
 
     if (form && btn) {
-    form.addEventListener('submit', function () {
+    function showFlash(message) {
+        var existing = document.querySelector('.flash-messages');
+        if (existing) existing.remove();
+        var d = document.createElement('div');
+        d.className = 'flash-messages';
+        d.setAttribute('role', 'status');
+        var p = document.createElement('p');
+        p.className = 'flash-messages__text';
+        p.textContent = message;
+        d.appendChild(p);
+        var nav = document.querySelector('.site-nav');
+        if (nav && nav.parentNode) {
+            nav.parentNode.insertBefore(d, nav.nextSibling);
+        } else {
+            document.body.insertBefore(d, document.body.firstChild);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Defensive onclick validator (runs even if other scripts error)
+    window.validateUpload = function () {
+        if (!input || !input.files || input.files.length === 0) {
+            showFlash('Please upload an image before analyzing.');
+            return false; // prevent submit
+        }
+        btn.disabled = true;
+        btn.textContent = 'Analyzing Ingredients...';
+        return true; // allow submit
+    };
+
+    form.addEventListener('submit', function (e) {
+        if (!input || !input.files || input.files.length === 0) {
+            e.preventDefault();
+            showFlash('Please upload an image before analyzing.');
+            return;
+        }
         btn.disabled = true;
         btn.textContent = 'Analyzing Ingredients...';
     });

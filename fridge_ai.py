@@ -26,7 +26,10 @@ def analyze_fridge_image(image_path: str) -> dict:
       is_fridge (bool), ingredients (list[str]), short_notes (str), demo (bool optional)
     """
     api_key = os.environ.get("OPENAI_API_KEY")
+    print(f"[fridge_ai] analyze_fridge_image called for: {image_path}")
+    print(f"[fridge_ai] OPENAI_API_KEY present: {bool(api_key)}")
     if not api_key:
+        print("[fridge_ai] No API key found — using demo fallback.")
         return {
             "is_fridge": True,
             "ingredients": ["milk", "eggs", "cheese", "tomatoes", "lettuce"],

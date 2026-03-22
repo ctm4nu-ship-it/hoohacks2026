@@ -665,10 +665,11 @@ form button[type="submit"]:disabled {
     margin: 0 0 22px;
 }
 .upload-box {
-    display: inline-grid;
-    gap: 10px;
-    grid-template-columns: 56px 1fr;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    gap: 14px;
     width: min(820px, 92%);
     padding: 34px 22px;
     border-radius: 14px;
@@ -678,16 +679,30 @@ form button[type="submit"]:disabled {
     color: inherit;
     box-shadow: 0 6px 20px rgba(0,0,0,0.04);
     margin: 0 auto 18px;
+    text-align: center;
 }
 .upload-icon {
     font-size: 28px;
-    width: 56px;
-    height: 56px;
-    display:flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(180deg,#ffefef,#fff2f4);
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(180deg,#ffefef,#fff2f4);
+}
+.upload-icon-circle,
+.upload-icon {
+    margin: 0 auto;
+}
+
+.upload-icon svg {
+    display: block;
+    margin: 0 auto;
 }
 .upload-text strong {font-size:1.05rem}
 .upload-hint {color:#888;font-size:0.95rem;margin-top:6px}
-.upload-meta {grid-column:1/-1;color:#a19;opacity:0.9;font-size:0.9rem;margin-top:6px}
+.upload-meta {color:#a19;opacity:0.95;font-size:0.95rem;margin-top:6px;text-align:center}
 
 .features-grid {
     display:flex;gap:18px;justify-content:center;margin-top:28px;flex-wrap:wrap
