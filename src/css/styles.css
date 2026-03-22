@@ -398,6 +398,47 @@ form button[type="submit"]:disabled {
 
 .filters-section {
     width: 100%;
+
+/* Centering for the upload box in templates/home.html */
+.upload-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: #fff;
+    border: 2.5px dashed #ffd6e3;
+    border-radius: 18px;
+    padding: 28px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#upload-box-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.upload-text--center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.upload-icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #fff6f4;
+}
 }
 
 .filters-intro {
