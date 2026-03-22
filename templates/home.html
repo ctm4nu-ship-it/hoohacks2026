@@ -1,106 +1,101 @@
-{% extends "base.html" %}
-{% block title %}SnapshotChef{% endblock %}
-{% block header_title %}Welcome to SnapshotChef{% endblock %}
+<div id="toast-container" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; display: none;">
+    <div id="toast-message" style="background: #e8445a; color: white; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 600; display: flex; align-items: center; gap: 10px;">
+        <span id="toast-icon">⚠️</span>
+        <span id="toast-text"></span>
+    </div>
+</div>
 
-{% block content %}
-<section class="hero-hero">
-    <div class="hero-inner">
-        <div class="hero-step">Step 1 of 3</div>
-        <h1 class="hero-title">Upload Your Fridge Photo</h1>
-        <p class="hero-sub">Our AI will analyze your ingredients and find perfect recipes</p>
-
-        <form id="upload-form" method="POST" action="{{ url_for('upload_image') }}" enctype="multipart/form-data" class="fridge-upload-form">
-            <label for="pdf-upload" class="upload-box upload-box--large" id="upload-box" style="cursor: pointer; display: block;">
-                
-                <div id="upload-box-content-wrapper">
-                    <div class="upload-icon-circle" id="upload-icon">
-                        <div class="upload-icon">
-                            <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle;">
-                                <circle cx="28" cy="28" r="28" fill="#fff6f4"/>
-                                <path d="M28 38V18M28 18l-7 7M28 18l7 7" stroke="#e8445a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="upload-text upload-text--center" id="upload-box-content">
-                        <strong class="upload-title">Drop your fridge photo here</strong>
-                        <div class="upload-hint">or click to browse from your device</div>
-                        <div class="upload-meta"><span class="meta-icon">🖼️</span> PNG, JPG, HEIC up to 10MB</div>
-                    </div>
+<form id="upload-form" method="POST" action="{{ url_for('upload_image') }}" enctype="multipart/form-data" class="fridge-upload-form">
+    <label for="pdf-upload" class="upload-box upload-box--large" id="upload-box" style="cursor: pointer; display: block; min-height: 250px;">
+        
+        <div id="upload-box-content-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 40px 0;">
+            <div class="upload-icon-circle" id="upload-icon" style="margin-bottom: 1rem;">
+                <div class="upload-icon">
+                    <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="28" cy="28" r="28" fill="#fff6f4"/>
+                        <path d="M28 38V18M28 18l-7 7M28 18l7 7" stroke="#e8445a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
-
-                <div id="upload-preview-wrap" style="display:none; flex-direction:column; align-items:center; gap:0.75rem; padding: 20px;">
-                    <img id="upload-preview-img" src="" alt="preview"
-                        style="max-height:180px; max-width:100%; border-radius:12px; object-fit:cover; box-shadow:0 2px 12px rgba(0,0,0,0.10);">
-                    <span id="upload-preview-name" style="font-size:0.85rem; color:#555;"></span>
-                    <span style="display:flex; align-items:center; gap:0.4rem; color:#22c55e; font-weight:700; font-size:1rem;">
-                        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="11" cy="11" r="11" fill="#22c55e"/>
-                            <path d="M6 11.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Photo ready!
-                    </span>
-                </div>
-
-                <input type="file" id="pdf-upload" name="pdfFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required style="display:none">
-            </label>
-            
-            <div style="height:18px"></div>
-            <button type="submit" id="upload-btn" class="cta-button" style="border: none; width: 100%; cursor: pointer;">Analyze Photo & Continue</button>
-        </form>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">🧠</div>
-                <h4>AI-Powered</h4>
-                <p>Instantly detect ingredients from your fridge photo.</p>
             </div>
-            <div class="feature-card">
-                <div class="feature-icon">🍳</div>
-                <h4>Smart Recipes</h4>
-                <p>Get personalized recipes based on what you have on hand.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🍃</div>
-                <h4>Reduce Waste</h4>
-                <p>Cook with ingredients you already own to cut waste.</p>
+            <div class="upload-text upload-text--center" id="upload-box-content">
+                <strong class="upload-title" style="display: block; font-size: 1.25rem;">Drop your fridge photo here</strong>
+                <div class="upload-hint" style="margin: 5px 0;">or click to browse from your device</div>
+                <div class="upload-meta"><span class="meta-icon">🖼️</span> PNG, JPG, HEIC up to 10MB</div>
             </div>
         </div>
-    </div>
-</section>
+
+        <div id="upload-preview-wrap" style="display:none; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; padding: 20px;">
+            <img id="upload-preview-img" src="" alt="preview" style="max-height:180px; max-width:100%; border-radius:12px; object-fit:cover;">
+            <span id="upload-preview-name" style="font-size:0.85rem; color:#555;"></span>
+            <span style="display:flex; align-items:center; gap:0.4rem; color:#22c55e; font-weight:700; font-size:1rem;">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="11" fill="#22c55e"/>
+                    <path d="M6 11.5l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Photo ready!
+            </span>
+        </div>
+
+        <input type="file" id="pdf-upload" name="pdfFile" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display:none">
+    </label>
+    
+    <div style="height:18px"></div>
+    <button type="submit" id="upload-btn" class="cta-button" style="border: none; width: 100%; cursor: pointer;">Analyze Photo & Continue</button>
+</form>
+
 {% endblock %}
 
 {% block scripts %}
 <script>
 (function () {
-    var form = document.getElementById('upload-form');
-    var btn = document.getElementById('upload-btn');
-    var input = document.getElementById('pdf-upload');
-    var previewWrap = document.getElementById('upload-preview-wrap');
-    var previewImg = document.getElementById('upload-preview-img');
-    var previewName = document.getElementById('upload-preview-name');
-    var boxContentWrapper = document.getElementById('upload-box-content-wrapper');
+    const form = document.getElementById('upload-form');
+    const btn = document.getElementById('upload-btn');
+    const input = document.getElementById('pdf-upload');
+    const toast = document.getElementById('toast-container');
+    const toastText = document.getElementById('toast-text');
+    
+    // Function to show the popup
+    function showToast(message) {
+        toastText.textContent = message;
+        toast.style.display = 'block';
+        // Hide after 3 seconds
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
 
+    // Handle file selection preview
     if (input) {
     input.addEventListener('change', function () {
-        var file = input.files[0];
+        const file = input.files[0];
         if (!file) return;
-        var reader = new FileReader();
+        
+        const reader = new FileReader();
         reader.onload = function (e) {
-        previewImg.src = e.target.result;
-        previewName.textContent = file.name;
-        boxContentWrapper.style.display = 'none';
-        previewWrap.style.display = 'flex';
-        };
+        document.getElementById('upload-preview-img').src = e.target.result;
+        document.getElementById('upload-preview-name').textContent = file.name;
+        document.getElementById('upload-box-content-wrapper').style.display = 'none';
+        document.getElementById('upload-preview-wrap').style.display = 'flex';
+    };
         reader.readAsDataURL(file);
     });
     }
 
-    if (form && btn) {
-    form.addEventListener('submit', function () {
+    // Handle Form Validation
+    if (form) {
+    form.addEventListener('submit', function (e) {
+        if (!input.files || input.files.length === 0) {
+            e.preventDefault(); // Stop the form from submitting
+            showToast("Please upload an image first!");
+            return;
+        }
+
+        // Optional: If you want to simulate the "Not a fridge" error for testing
+        // You would normally do this check after the AI processes it on the backend
+        
         btn.disabled = true;
         btn.textContent = 'Analyzing Ingredients...';
     });
     }
 })();
 </script>
-{% endblock %}
